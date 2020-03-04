@@ -81,5 +81,7 @@ sbt '; set javaOptions += "-Dconfig.resource=application-overrides.conf"; run --
 Finally, here is an example running against a large CSV:
 
 ```bash
-sbt "run --csv=src/main/resources/<large?>.csv --hasHeader=true"
+sbt "run --csv=src/main/resources/500000-sales-records.csv --hasHeader=true"
 ```
+
+![App resources](docs/images/app-resources.png)
