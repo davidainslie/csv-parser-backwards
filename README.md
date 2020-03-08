@@ -38,50 +38,44 @@ $ sbt coverageReport
 
 #### Run
 
-When **running** provide the **csv** file and if necessary does it include a **header** - by default a header is not expected. The options to use when running are:
+When **running** provide the **csv** file and any optional arguments as follows:
 
-- **--csv** or **-c** providing the path (relative/absolute) of the csv file e.g.
+- **--csv** or **-c** the path (relative/absolute) of the csv file e.g.
 
   --csv=src/main/resources/my-input.csv
 
-- **--hasHeader** or **-h** providing true/false indicating whether the csv includes a header (the default is **false**) e.g.
+- **--header** or **-h** optional true/false indicating whether the csv includes a header (default is **false**) e.g.
 
-  --hadHeader=true
+  --header=true
+  
+- **--quote** or **-q** optional quote allowing for a line to span multiple lines (default is **""**) e.g.
 
-There are some example [csv files](src/main/resources) which can be used to run e.g.
+  --quote='
 
-```bash
-sbt "run --csv=src/main/resources/includes-header.csv --hasHeader=true"
-```
+- **--fieldDelimiter** or **-f** optional marker between fields (default is **,**) e.g.
 
-```bash
-sbt "run --csv=src/main/resources/excludes-header.csv"
-```
+  --fieldDelimiter=;
 
-There are also the following configurations with defaults in [application.conf](src/main/resources/application.conf):
+- **--lineDelimiter** or **-l** optional marker between lines (default is **\n**) e.g.
 
-- **quote**: csv lines can span multiple lines via quoting, where **"** is the default
-- **field-delimiter**: separate fields within a line, where **,** is the default
-- **line-delimiter**: designate end of line, where **\n** is the default
+  --lineDelimiter=\r\n
 
-Using sbt to override via system properties is a tad convoluted. Instead (though also slightly convoluted) an overriding application configuration can be specified such as [application-overrides.conf](src/main/resources/application-overrides.conf) which has the following (where property **line-delimiter** is not declared so will use the default): 
-
-```yaml
-csv {
-  field-delimiter = ";"
-}
-```
-
-and to use the (custom) application configuration:
+There are some example [csv files](src/main/resources) which can be used to run (showing use of overriding command arguments) e.g.
 
 ```bash
-sbt '; set javaOptions += "-Dconfig.resource=application-overrides.conf"; run --csv=src/main/resources/excludes-header.csv'
+sbt 'run --csv=src/main/resources/includes-header.csv --header=true'
 ```
+
+```bash
+sbt 'run -c=src/main/resources/excludes-header.csv --fieldDelimiter=";"'
+```
+
+NOTE that the last example **quoted** the field delimiter. Any of the argument values can be quoted in case they have special meaning e.g. **;** (the semicolon) separates command line arguments.
 
 Finally, here is an example running against a large CSV:
 
 ```bash
-sbt "run --csv=src/main/resources/500000-sales-records.csv --hasHeader=true"
+sbt 'run --csv=src/main/resources/500000-sales-records.csv --header=true'
 ```
 
 ![App resources](docs/images/app-resources.png)

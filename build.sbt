@@ -2,6 +2,7 @@ lazy val root = project("csv-parser-backwards", file("."))
 
 def project(id: String, base: File): Project =
   Project(id, base)
+    .enablePlugins(JavaAppPackaging)
     .settings(
       scalaVersion := BuildProperties("scala.version"),
       sbtVersion := BuildProperties("sbt.version"),

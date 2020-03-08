@@ -6,12 +6,19 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class CsvParserSpec extends AnyWordSpec with Matchers {
   "CSV parser using default configurations" should {
-    val csvConfig = CsvConfig().getOrElse(throw new Exception)
-    val csvParser = new CsvParser(csvConfig)
+    val csvParser = new CsvParser(CsvConfig())
 
     "parse a simple line" in {
       val line =
         """aa,bb""".stripMargin
+
+      csvParser.parse(line) mustBe List(List("aa", "bb")).asRight
+    }
+
+    "parse a simple line that ends with a new line" in {
+      val line =
+        """aa,bb
+          |""".stripMargin
 
       csvParser.parse(line) mustBe List(List("aa", "bb")).asRight
     }
@@ -24,10 +31,14 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
 
       csvParser.parse(line) mustBe List(List("a", "a split\ncell", ""), List("b", "something else")).asRight
     }
+
+    "fail to parse incomplete line" in {
+      csvParser.parse("\"") mustBe "end of input expected".asLeft
+    }
   }
 
   "CSV parser using configuration overrides" should {
-    val csvConfig = CsvConfig(Quote("'"), FieldDelimiter("::"))
+    val csvConfig = CsvConfig(quote = Quote("'"), fieldDelimiter = FieldDelimiter("::"))
     val csvParser = new CsvParser(csvConfig)
 
     "parse a simple line" in {
