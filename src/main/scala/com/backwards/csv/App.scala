@@ -10,10 +10,15 @@ object App extends IOApp {
     Stream.resource(Blocker[IO]).flatMap { blocker =>
       io.file
         .readAll[IO](csvPath, blocker, 4 * 4096)
-        .through(text.utf8Decode)
+        .map(_.toChar.toString)
+        .append(Stream.eval(IO.pure(csvParser.csvConfig.lineDelimiter.value)))
+        .scan(NewLineChars())(NewLineChars.conflate(csvParser.csvConfig.lineDelimiter))
+        .map { case NewLineChars(_, chars) =>
+          chars
+        }
         .through(text.lines)
         .drop(if (csvParser.csvConfig.header.value) 1 else 0)
-        .scan(Lines())(Line.conflate(csvParser.csvConfig.quote))
+        .scan(Lines())(Lines.conflate(csvParser.csvConfig.quote))
         .filter { case Lines(_, line) =>
           line.trim.nonEmpty
         }

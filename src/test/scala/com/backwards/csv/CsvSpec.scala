@@ -1,11 +1,11 @@
 package com.backwards.csv
 
 import java.io.File
+import cats.implicits._
 import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import com.backwards.csv.ArgsParser.parse
-import cats.implicits._
 
 class CsvSpec extends AnyWordSpec with Matchers with EitherValues {
   "CSV longhand command line arguments" should {

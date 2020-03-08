@@ -58,17 +58,17 @@ When **running** provide the **csv** file and any optional arguments as follows:
 
 - **--lineDelimiter** or **-l** optional marker between lines (default is **\n**) e.g.
 
-  --lineDelimiter=\r\n
+  --lineDelimiter=EOL
 
 Following are some example [csv files](src/main/resources) which can be used to run (showing use of overriding command arguments). However, note that often the value of an argument will have to be quoted e.g. if we chose **;** (semicolon) to be a field delimiter, this would have to be quoted as **";"** because semicolon on the command line is also a way to separate commands. Unfortunately, sbt is not very good at quoting, so we either have to jump into the sbt shell before running the application, or package up the application and then run it. Let's go through some of the various ways.
 
-A CSV that has a header and defaults all other configurations:
+#### CSV that has a header and defaults all other configurations:
 
 ```bash
 sbt 'run --csv=src/main/resources/includes-header.csv --header=true'
 ```
 
-A CSV without a header and overrides field delimiter:
+#### CSV without a header and overrides field delimiter:
 
 ```bash
 sbt 'run -c=src/main/resources/excludes-header.csv --fieldDelimiter=";"'
@@ -76,7 +76,9 @@ sbt 'run -c=src/main/resources/excludes-header.csv --fieldDelimiter=";"'
 
 Note that the **field delimiter** must be **quoted**.
 
-But what if we wanted to override the default **"** double quote to be **'** single quote? The following would not work:
+#### CSV overrides default of double quote with single quote
+
+So what if we wanted to override the default **"** double quote to be **'** single quote regarding a line spanning multiple lines? The following would not work:
 
 ```bash
 sbt 'run -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"' 
@@ -110,7 +112,17 @@ bin/csv-parser-backwards -c=src/main/resources/excludes-header-single-quote.csv 
 
 (For a Windows machine the **csv-parser-backwards** would be replaced by **csv-parser-backwards.bat**).
 
-Finally, here is an example running against a large CSV:
+#### CSV with non standard "new line"
+
+Usually new lines are indicated by **\n** (on Mac and Linux) or **\r\n** (on Windows). Let's see an example of a customised new line indicated by **EOL**:
+
+```bash
+sbt 'run -c=src/main/resources/excludes-header-eol.csv --fieldDelimiter=";" --lineDelimiter=EOL'
+```
+
+#### Performance
+
+Finally, here is an example running against a large CSV showing that resource usage stays constant:
 
 ```bash
 sbt 'run --csv=src/main/resources/500000-sales-records.csv --header=true'
