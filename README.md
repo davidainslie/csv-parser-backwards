@@ -60,17 +60,55 @@ When **running** provide the **csv** file and any optional arguments as follows:
 
   --lineDelimiter=\r\n
 
-There are some example [csv files](src/main/resources) which can be used to run (showing use of overriding command arguments) e.g.
+Following are some example [csv files](src/main/resources) which can be used to run (showing use of overriding command arguments). However, note that often the value of an argument will have to be quoted e.g. if we chose **;** (semicolon) to be a field delimiter, this would have to be quoted as **";"** because semicolon on the command line is also a way to separate commands. Unfortunately, sbt is not very good at quoting, so we either have to jump into the sbt shell before running the application, or package up the application and then run it. Let's go through some of the various ways.
+
+A CSV that has a header and defaults all other configurations:
 
 ```bash
 sbt 'run --csv=src/main/resources/includes-header.csv --header=true'
 ```
 
+A CSV without a header and overrides field delimiter:
+
 ```bash
 sbt 'run -c=src/main/resources/excludes-header.csv --fieldDelimiter=";"'
 ```
 
-NOTE that the last example **quoted** the field delimiter. Any of the argument values can be quoted in case they have special meaning e.g. **;** (the semicolon) separates command line arguments.
+Note that the **field delimiter** must be **quoted**.
+
+But what if we wanted to override the default **"** double quote to be **'** single quote? The following would not work:
+
+```bash
+sbt 'run -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"' 
+```
+
+the single quote defined by **--quote** effectively closes the first single quote at the start of the sbt command. We can get around this by first stepping into the sbt shell and then running the command:
+
+```bash
+sbt
+```
+
+and then:
+
+```scala
+run -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"
+```
+
+Or, we can **package** the application providing **univeral** scripts to run, allowing us to provide the command arguments.
+
+From the **project root**, first build the application:
+
+```bash
+sbt universal:packageBin
+```
+
+and then:
+
+```bash
+target/universal/stage/bin/csv-parser-backwards -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"
+```
+
+(For a Windows machine the **csv-parser-backwards** would be replaced by **csv-parser-backwards.bat**).
 
 Finally, here is an example running against a large CSV:
 

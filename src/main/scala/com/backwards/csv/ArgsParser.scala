@@ -13,7 +13,7 @@ object ArgsParser {
     Header.apply _ andThen (Csv.csvConfig composeLens CsvConfig.header).set
 
   lazy val quote: String => Csv => Csv =
-    Quote.apply _ andThen (Csv.csvConfig composeLens CsvConfig.quote).set
+    filter andThen Quote.apply andThen (Csv.csvConfig composeLens CsvConfig.quote).set
 
   lazy val fieldDelimiter: String => Csv => Csv =
     filter andThen FieldDelimiter.apply andThen (Csv.csvConfig composeLens CsvConfig.fieldDelimiter).set

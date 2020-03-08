@@ -15,7 +15,7 @@ class CsvParser(val csvConfig: CsvConfig) extends RegexParsers {
 
   val crlf: Parser[String] = csvConfig.lineDelimiter.value // "\r\n" | "\n"
 
-  val text: Regex = "[^\"\r\n%s]".format(delimiter).r
+  val text: Regex = "[^%s%s\r\n]".format(quote, delimiter).r // TODO line delimiter instead of \r\n, but so far does not work
 
   val unquotedField: Parser[String] = rep(text) ^^ (_.mkString)
 

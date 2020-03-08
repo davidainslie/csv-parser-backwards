@@ -9,9 +9,12 @@ package com.backwards.csv
  * </pre>
  */
 object Line {
-  def conflate(quote: Quote = Quote())(lines: Lines, line: String): Lines =
-    if ((lines.accumulatedLines.mkString + line).count(_.toString == quote.value) % 2 == 0)
-      Lines(Nil, lines.accumulatedLines.mkString(" ") + line)
+  def conflate(quote: Quote)(lines: Lines, line: String): Lines = {
+    val accumulatedLines = lines.accumulatedLines :+ line
+
+    if (accumulatedLines.mkString.count(_.toString == quote.value) % 2 == 0)
+      Lines(Nil, accumulatedLines.mkString(" "))
     else
-      Lines(lines.accumulatedLines :+ line)
+      Lines(accumulatedLines)
+  }
 }

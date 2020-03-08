@@ -38,14 +38,26 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
   }
 
   "CSV parser using configuration overrides" should {
-    val csvConfig = CsvConfig(quote = Quote("'"), fieldDelimiter = FieldDelimiter("::"))
-    val csvParser = new CsvParser(csvConfig)
+    "parse a simple line overriding field delimiter" in {
+      val csvConfig = CsvConfig(fieldDelimiter = FieldDelimiter("::"))
+      val csvParser = new CsvParser(csvConfig)
 
-    "parse a simple line" in {
       val line =
         """cc::dd""".stripMargin
 
       csvParser.parse(line) mustBe List(List("cc", "dd")).asRight
     }
+
+    /*"parse a line that spans multiple lines overriding quote" in {
+      val csvConfig = CsvConfig(quote = Quote("'"))
+      val csvParser = new CsvParser(csvConfig)
+
+      val line =
+        """a,'a split
+          |cell',
+          |b,'something else'""".stripMargin
+
+      csvParser.parse(line) mustBe List(List("a", "a split\ncell", ""), List("b", "something else")).asRight
+    }*/
   }
 }
