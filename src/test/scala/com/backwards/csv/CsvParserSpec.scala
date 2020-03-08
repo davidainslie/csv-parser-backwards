@@ -48,7 +48,7 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
       csvParser.parse(line) mustBe List(List("cc", "dd")).asRight
     }
 
-    /*"parse a line that spans multiple lines overriding quote" in {
+    "parse a line that spans multiple lines overriding quote" in {
       val csvConfig = CsvConfig(quote = Quote("'"))
       val csvParser = new CsvParser(csvConfig)
 
@@ -58,6 +58,6 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
           |b,'something else'""".stripMargin
 
       csvParser.parse(line) mustBe List(List("a", "a split\ncell", ""), List("b", "something else")).asRight
-    }*/
+    }
   }
 }

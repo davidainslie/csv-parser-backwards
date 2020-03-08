@@ -29,10 +29,10 @@ class CsvParser(val csvConfig: CsvConfig) extends RegexParsers {
   val csv: Parser[List[List[String]]] = rep(line)
 
   def parse(line: String): String Either List[List[String]] = {
-    if (line.endsWith(System.lineSeparator())) // TODO - Use configured line delimiter
+    if (line.endsWith(csvConfig.lineDelimiter.value/*System.lineSeparator()*/)) // TODO - Use configured line delimiter
       parseAll(csv, line)
     else
-      parseAll(csv, line + System.lineSeparator()) // TODO - Use configured line delimiter
+      parseAll(csv, line + csvConfig.lineDelimiter.value/*System.lineSeparator()*/) // TODO - Use configured line delimiter
   } match {
     case Success(result, _) => result.asRight[String]
     case Failure(message, _) => message.asLeft[List[List[String]]]
