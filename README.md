@@ -99,13 +99,13 @@ Or, we can **package** the application providing **univeral** scripts to run, al
 From the **project root**, first build the application:
 
 ```bash
-sbt universal:packageBin
+sbt build
 ```
 
-and then:
+where **build** is an alias for **universal:packageBin** to conveniently put the binaries under <root>/bin, and then:
 
 ```bash
-target/universal/stage/bin/csv-parser-backwards -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"
+bin/csv-parser-backwards -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"
 ```
 
 (For a Windows machine the **csv-parser-backwards** would be replaced by **csv-parser-backwards.bat**).

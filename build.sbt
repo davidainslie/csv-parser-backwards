@@ -4,6 +4,8 @@ def project(id: String, base: File): Project =
   Project(id, base)
     .enablePlugins(JavaAppPackaging)
     .settings(
+      maintainer := "Backwards",
+      organization := "com.backwards",
       scalaVersion := BuildProperties("scala.version"),
       sbtVersion := BuildProperties("sbt.version"),
       name := id,
