@@ -3,12 +3,12 @@ package com.backwards.csv
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class LineSpec extends AnyWordSpec with Matchers {
+class LinesSpec extends AnyWordSpec with Matchers {
   "Line with default quote" should {
     val quote = Quote()
 
     val conflate: (Lines, String) => Lines =
-      Line.conflate(quote)
+      Lines.conflate(quote)
 
     "be conflated from single line" in {
       val line = "My line"
@@ -33,7 +33,7 @@ class LineSpec extends AnyWordSpec with Matchers {
     val quote = Quote("#")
 
     val conflate: (Lines, String) => Lines =
-      Line.conflate(quote)
+      Lines.conflate(quote)
 
     "be conflated from single line" in {
       val line = "My line"
