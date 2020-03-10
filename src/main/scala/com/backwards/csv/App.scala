@@ -12,17 +12,18 @@ object App extends IOApp {
         .readAll[IO](csvPath, blocker, 4 * 4096)
         .map(_.toChar.toString)
         .append(Stream.eval(IO.pure(csvParser.csvConfig.lineDelimiter.value)))
-        .scan(NewLineChars())(NewLineChars.conflate(csvParser.csvConfig.lineDelimiter))
-        .map { case NewLineChars(_, chars) =>
+        //.scan(NewLineChars())(NewLineChars.conflate(csvParser.csvConfig.lineDelimiter))
+        /*.map { case NewLineChars(_, chars) =>
           chars
-        }
-        .through(text.lines)
+        }*/
+        //.through(text.lines)
+        //.drop(if (csvParser.csvConfig.header.value) 1 else 0)
+        .scan(Line())(Line.conflate(csvParser.csvConfig))
         .drop(if (csvParser.csvConfig.header.value) 1 else 0)
-        .scan(Lines())(Lines.conflate(csvParser.csvConfig.quote))
-        .filter { case Lines(_, line) =>
+        .filter { case Line(_, line) =>
           line.trim.nonEmpty
         }
-        .map { case Lines(_, line) =>
+        .map { case Line(_, line) =>
           csvParser.parse(line)
         }
         .foldMap {
