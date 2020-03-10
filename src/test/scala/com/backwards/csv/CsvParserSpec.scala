@@ -3,6 +3,7 @@ package com.backwards.csv
 import cats.implicits._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import com.backwards.tag._
 
 class CsvParserSpec extends AnyWordSpec with Matchers {
   "CSV parser using default configurations" should {
@@ -39,7 +40,7 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
 
   "CSV parser using configuration overrides" should {
     "parse a simple line overriding field delimiter" in {
-      val csvConfig = CsvConfig(fieldDelimiter = FieldDelimiter("::"))
+      val csvConfig = CsvConfig(fieldDelimiter = "::".tag[FieldDelimiter])
       val csvParser = new CsvParser(csvConfig)
 
       val line =
@@ -49,7 +50,7 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
     }
 
     "parse a line that spans multiple lines overriding quote" in {
-      val csvConfig = CsvConfig(quote = Quote("'"))
+      val csvConfig = CsvConfig(quote = "'".tag[Quote])
       val csvParser = new CsvParser(csvConfig)
 
       val line =

@@ -11,23 +11,18 @@ object App extends IOApp {
       io.file
         .readAll[IO](csvPath, blocker, 4 * 4096)
         .map(_.toChar.toString)
-        .append(Stream.eval(IO.pure(csvParser.csvConfig.lineDelimiter.value)))
-        .scan(NewLineChars())(NewLineChars.conflate(csvParser.csvConfig.lineDelimiter))
-        .map { case NewLineChars(_, chars) =>
-          chars
-        }
-        .through(text.lines)
-        .drop(if (csvParser.csvConfig.header.value) 1 else 0)
-        .scan(Lines())(Lines.conflate(csvParser.csvConfig.quote))
-        .filter { case Lines(_, line) =>
+        .append(Stream.eval(IO.pure(csvParser.csvConfig.lineDelimiter)))
+        .scan(Line())(Line.conflate(csvParser.csvConfig))
+        .filter { case Line(_, line) =>
           line.trim.nonEmpty
         }
-        .map { case Lines(_, line) =>
+        .drop(if (csvParser.csvConfig.header) 1 else 0)
+        .map { case Line(_, line) =>
           csvParser.parse(line)
         }
         .foldMap {
           case Right(lines) =>
-            scribe.info(lines.flatten.show)
+            scribe.info(lines.flatten.map(_.replaceAll(csvParser.csvConfig.lineDelimiter, " ")).show)
             1
           case Left(errorMessage) =>
             scribe.error(errorMessage)
