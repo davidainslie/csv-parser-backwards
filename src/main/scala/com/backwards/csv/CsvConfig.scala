@@ -1,46 +1,29 @@
 package com.backwards.csv
 
 import cats.Show
-import cats.syntax.show._
 import monocle.macros.Lenses
+import shapeless.tag.@@
+import com.backwards.tag._
 
 @Lenses
 final case class CsvConfig(
-  header: Header = Header(),
-  quote: Quote = Quote(),
-  fieldDelimiter: FieldDelimiter = FieldDelimiter(),
-  lineDelimiter: LineDelimiter = LineDelimiter()
+  header: Boolean @@ Header = false.tag[Header],
+  quote: String @@ Quote = "\"".tag[Quote],
+  fieldDelimiter: String @@ FieldDelimiter = ",".tag[FieldDelimiter],
+  lineDelimiter: String @@ LineDelimiter = "\n".tag[LineDelimiter]
 )
 
 object CsvConfig {
   implicit val csvConfigShow: Show[CsvConfig] =
-    c => s"CsvConfig(header = ${c.header.show} quote = ${c.quote.show}, fieldDelimiter = ${c.fieldDelimiter.show}, lineDelimiter = ${c.lineDelimiter.show})"
+    c => s"CsvConfig(header = ${c.header} quote = ${c.quote}, fieldDelimiter = ${c.fieldDelimiter}, lineDelimiter = ${c.lineDelimiter})"
+
+  def apply: CsvConfig = CsvConfig()
 }
 
-final case class Header(value: Boolean = false) extends AnyVal
+trait Header
 
-object Header {
-  implicit val headerShow: Show[Header] =
-    h => s"Header(value = ${h.value}"
-}
+trait Quote
 
-final case class Quote(value: String = "\"") extends AnyVal
+trait FieldDelimiter
 
-object Quote {
-  implicit val quoteShow: Show[Quote] =
-    q => s"Quote(value = ${q.value}"
-}
-
-final case class FieldDelimiter(value: String = ",") extends AnyVal
-
-object FieldDelimiter {
-  implicit val fieldDelimiterShow: Show[FieldDelimiter] =
-    f => s"FieldDelimiter(value = ${f.value}"
-}
-
-final case class LineDelimiter(value: String = "\n") extends AnyVal
-
-object LineDelimiter {
-  implicit val lineDelimiterShow: Show[LineDelimiter] =
-    l => s"LineDelimiter(value = ${l.value}"
-}
+trait LineDelimiter

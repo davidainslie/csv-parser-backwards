@@ -78,7 +78,7 @@ Note that the **field delimiter** must be **quoted**.
 
 #### CSV overrides default of double quote with single quote
 
-So what if we wanted to override the default **"** double quote to be **'** single quote regarding a line spanning multiple lines? The following would not work:
+So what if we wanted to override the default **"** double quote to be **'** single quote regarding a line spanning multiple lines? **The following will not work**:
 
 ```bash
 sbt 'run -c=src/main/resources/excludes-header-single-quote.csv --quote="'" --fieldDelimiter=";"' 

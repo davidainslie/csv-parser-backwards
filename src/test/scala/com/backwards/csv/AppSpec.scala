@@ -5,12 +5,13 @@ import java.nio.file.Paths
 import cats.effect.ExitCode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import com.backwards.tag._
 
 class AppSpec extends AnyWordSpec with Matchers {
   "App" should {
     "parse a CSV of 2 lines with a header" in {
       val file = new File("src/main/resources/includes-header.csv")
-      val csvParser = new CsvParser(CsvConfig(header = Header(true)))
+      val csvParser = new CsvParser(CsvConfig(header = true.tag[Header]))
 
       val app = App.parse(Paths.get(file.toURI), csvParser)
 
@@ -19,7 +20,7 @@ class AppSpec extends AnyWordSpec with Matchers {
 
     "parse a CSV of 3 lines without a header" in {
       val file = new File("src/main/resources/excludes-header.csv")
-      val csvParser = new CsvParser(CsvConfig(fieldDelimiter = FieldDelimiter(";")))
+      val csvParser = new CsvParser(CsvConfig(fieldDelimiter = ";".tag[FieldDelimiter]))
 
       val app = App.parse(Paths.get(file.toURI), csvParser)
 

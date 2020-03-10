@@ -3,7 +3,7 @@ package com.backwards.csv
 import java.lang.System.lineSeparator
 
 /**
- * A line is either singular, or can be conflated from multiple lines by "quoting" text, where the "quote" is configurable.
+ * A line is either singular, or can be conflated from multiple lines by "quoting" text, where "quote" and "line delimiter" are configurable.
  * e.g. a multi-line using the default quote:
  * <pre>
  *  cell,"a split
@@ -16,21 +16,11 @@ object Line {
   def conflate(csvConfig: CsvConfig)(line: Line, chars: String): Line = {
     val accumulatedChars = line.accumulatedChars :+ chars
 
-    println(accumulatedChars.mkString.count(_.toString == csvConfig.quote.value) % 2 == 0)
-    println(accumulatedChars.mkString.endsWith(csvConfig.lineDelimiter.value))
-
-    if (accumulatedChars.mkString.count(_.toString == csvConfig.quote.value) % 2 == 0 &&
-        accumulatedChars.mkString.endsWith(csvConfig.lineDelimiter.value)) {
-      Line(Nil, accumulatedChars.mkString.stripSuffix(csvConfig.lineDelimiter.value) + lineSeparator)
+    if (accumulatedChars.mkString.count(_.toString == csvConfig.quote) % 2 == 0 &&
+        accumulatedChars.mkString.endsWith(csvConfig.lineDelimiter)) {
+      Line(Nil, accumulatedChars.mkString.stripSuffix(csvConfig.lineDelimiter) + lineSeparator)
     } else {
       Line(accumulatedChars)
     }
-
-
-    /*if (accumulatedChars.mkString.count(_.toString == quote.value) % 2 == 0) {
-      Line(Nil, accumulatedChars.mkString(" "))
-    } else {
-      Line(accumulatedChars)
-    }*/
   }
 }

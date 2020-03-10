@@ -8,9 +8,9 @@ import cats.implicits._
 class CsvParser(val csvConfig: CsvConfig) extends RegexParsers {
   override val skipWhitespace = false
 
-  val quote: String = csvConfig.quote.value
+  val quote: String = csvConfig.quote
 
-  val delimiter: String = csvConfig.fieldDelimiter.value
+  val delimiter: String = csvConfig.fieldDelimiter
 
   val crlf: Parser[String] = lineSeparator
 

@@ -6,22 +6,23 @@ import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import com.backwards.csv.ArgsParser.parse
+import com.backwards.tag._
 
 class CsvSpec extends AnyWordSpec with Matchers with EitherValues {
   "CSV longhand command line arguments" should {
     "be parsed upon providing all options" in {
       val file = new File("my-input.csv")
-      val header = Header(true)
-      val quote = Quote("'")
-      val fieldDelimiter = FieldDelimiter("|")
-      val lineDelimiter = LineDelimiter("\r\n")
+      val header = true.tag[Header]
+      val quote = "'".tag[Quote]
+      val fieldDelimiter = "|".tag[FieldDelimiter]
+      val lineDelimiter = "\r\n".tag[LineDelimiter]
 
       val args = List(
         s"--csv=${file.getName}",
-        s"--header=${header.value}",
-        s"--quote=${quote.value}",
-        s"--fieldDelimiter=${fieldDelimiter.value}",
-        s"--lineDelimiter=${lineDelimiter.value}"
+        s"--header=$header",
+        s"--quote=$quote",
+        s"--fieldDelimiter=$fieldDelimiter",
+        s"--lineDelimiter=$lineDelimiter"
       )
 
       parse(args) mustBe Csv(file, CsvConfig(header, quote, fieldDelimiter, lineDelimiter)).some
@@ -39,17 +40,17 @@ class CsvSpec extends AnyWordSpec with Matchers with EitherValues {
   "CSV shorthand command line arguments" should {
     "be parsed upon providing all options" in {
       val file = new File("my-input.csv")
-      val header = Header(true)
-      val quote = Quote("'")
-      val fieldDelimiter = FieldDelimiter("|")
-      val lineDelimiter = LineDelimiter("\r\n")
+      val header = true.tag[Header]
+      val quote = "'".tag[Quote]
+      val fieldDelimiter = "|".tag[FieldDelimiter]
+      val lineDelimiter = "\r\n".tag[LineDelimiter]
 
       val args = List(
         s"-c=${file.getName}",
-        s"-h=${header.value}",
-        s"-q=${quote.value}",
-        s"-f=${fieldDelimiter.value}",
-        s"-l=${lineDelimiter.value}"
+        s"-h=$header",
+        s"-q=$quote",
+        s"-f=$fieldDelimiter",
+        s"-l=$lineDelimiter"
       )
 
       parse(args) mustBe Csv(file, CsvConfig(header, quote, fieldDelimiter, lineDelimiter)).some

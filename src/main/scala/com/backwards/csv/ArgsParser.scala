@@ -2,24 +2,26 @@ package com.backwards.csv
 
 import java.io.File
 import scala.Function.{uncurried => uncurry}
+import scala.util.chaining._
 import scala.util.matching.Regex
 import scopt.OParser
+import com.backwards.tag._
 
 object ArgsParser {
   lazy val file: File => Csv => Csv =
     Csv.file.set
 
   lazy val header: Boolean => Csv => Csv =
-    Header.apply _ andThen (Csv.csvConfig composeLens CsvConfig.header).set
+    _.tag[Header] pipe (Csv.csvConfig composeLens CsvConfig.header).set
 
   lazy val quote: String => Csv => Csv =
-    filter andThen Quote.apply andThen (Csv.csvConfig composeLens CsvConfig.quote).set
+    filter andThen (_.tag[Quote] pipe (Csv.csvConfig composeLens CsvConfig.quote).set)
 
   lazy val fieldDelimiter: String => Csv => Csv =
-    filter andThen FieldDelimiter.apply andThen (Csv.csvConfig composeLens CsvConfig.fieldDelimiter).set
+    filter andThen (_.tag[FieldDelimiter] pipe (Csv.csvConfig composeLens CsvConfig.fieldDelimiter).set)
 
   lazy val lineDelimiter: String => Csv => Csv =
-    filter andThen LineDelimiter.apply andThen (Csv.csvConfig composeLens CsvConfig.lineDelimiter).set
+    filter andThen (_.tag[LineDelimiter] pipe (Csv.csvConfig composeLens CsvConfig.lineDelimiter).set)
 
   lazy val Filter: Regex = "\"(.*)\"".r
 
@@ -45,19 +47,19 @@ object ArgsParser {
         opt[Boolean]('h', "header")
           .optional()
           .action(uncurry(header))
-          .text(s"header is an optional boolean property - whether the given csv includes a header: ${Header().value} by default"),
+          .text(s"header is an optional boolean property - whether the given csv includes a header: ${CsvConfig.header} by default"),
         opt[String]('q', "quote")
           .optional()
           .action(uncurry(quote))
-          .text(s"""quote is an optional string property - allowing a line to span multiple lines: ${Quote().value} by default"""),
+          .text(s"""quote is an optional string property - allowing a line to span multiple lines: ${CsvConfig.quote} by default"""),
         opt[String]('f', "fieldDelimiter")
           .optional()
           .action(uncurry(fieldDelimiter))
-          .text(s"""fieldDelimiter is an optional string property - denoting field separation: ${FieldDelimiter().value} by default"""),
+          .text(s"""fieldDelimiter is an optional string property - denoting field separation: ${CsvConfig.fieldDelimiter} by default"""),
         opt[String]('l', "lineDelimiter")
           .optional()
           .action(uncurry(lineDelimiter))
-          .text(s"""lineDelimiter is an optional string property - denoting line separation: ${LineDelimiter().value} by default""")
+          .text(s"""lineDelimiter is an optional string property - denoting line separation: ${CsvConfig.lineDelimiter} by default""")
       )
     }
 
