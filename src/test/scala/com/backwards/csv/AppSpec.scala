@@ -27,15 +27,6 @@ class AppSpec extends AnyWordSpec with Matchers {
       app.compile.lastOrError.unsafeRunSync mustBe 3
     }
 
-    "highlight invalid lines when parsing a CSV not matching command line arguments" in {
-      val file = new File("src/main/resources/excludes-header.csv")
-      val csvParser = new CsvParser(CsvConfig())
-
-      val app = App.parse(Paths.get(file.toURI), csvParser)
-
-      app.compile.lastOrError.unsafeRunSync mustBe 0
-    }
-
     "run" in {
       val args = List("--csv=src/main/resources/includes-header.csv", "--header=true")
 

@@ -8,24 +8,26 @@ import cats.implicits._
 class CsvParser(val csvConfig: CsvConfig) extends RegexParsers {
   override val skipWhitespace = false
 
-  val quote: String = csvConfig.quote
+  def quote: String = csvConfig.quote
 
-  val delimiter: String = csvConfig.fieldDelimiter
+  def delimiter: String = csvConfig.fieldDelimiter
 
-  val crlf: Parser[String] = lineSeparator
+  def crlf: Parser[String] = lineSeparator
 
-  val text: Regex = "[^%s%s%s]".format(quote, delimiter, lineSeparator).r
+  def text: Regex = "[^%s%s%s]".format(quote, delimiter, lineSeparator).r
 
-  val unquotedField: Parser[String] = rep(text) ^^ (_.mkString)
+  def unquotedField: Parser[String] = rep(text) ^^ (_.mkString)
 
-  val quotedField: Parser[String] =
+  def quotedField: Parser[String] =
     quote ~> rep(text | delimiter | crlf) <~ quote ^^ (_.mkString)
 
-  val field: Parser[String] = quotedField | unquotedField
+  def field: Parser[String] = opt(unquotedField) ~ opt(quotedField) ~ opt(unquotedField) ^^ {
+    case o1 ~ o2 ~ o3 => o1.getOrElse("") + o2.getOrElse("") + o3.getOrElse("")
+  }
 
-  val line: Parser[List[String]] = repsep(field, delimiter) <~ crlf
+  def line: Parser[List[String]] = repsep(field, delimiter) <~ crlf
 
-  val csv: Parser[List[List[String]]] = rep(line)
+  def csv: Parser[List[List[String]]] = rep(line)
 
   def parse(line: String): String Either List[List[String]] = {
     if (line.endsWith(lineSeparator))

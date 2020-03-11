@@ -33,6 +33,12 @@ class CsvParserSpec extends AnyWordSpec with Matchers {
       csvParser.parse(line) mustBe List(List("a", "a split\ncell", ""), List("b", "something else")).asRight
     }
 
+    "parse a line where a field has both quoted and unquoted text" in {
+      val line = """"abc,"onetwo,three,doremi"""
+
+      csvParser.parse(line) mustBe List(List("abc,onetwo", "three", "doremi")).asRight
+    }
+
     "fail to parse incomplete line" in {
       csvParser.parse("\"") mustBe "end of input expected".asLeft
     }
