@@ -60,12 +60,24 @@ When **running** provide the **csv** file and any optional arguments as follows:
 
   --lineDelimiter=EOL
 
+Also, there is an optional argument to set log level:
+
+- **--logLevel** of either **debug**, **info**, **warn** or **error** (default is **info**) e.g.
+
+  --logLevel=debug
+
 Following are some example [csv files](src/main/resources) which can be used to run (showing use of overriding command arguments). However, note that often the value of an argument will have to be quoted e.g. if we chose **;** (semicolon) to be a field delimiter, this would have to be quoted as **";"** because semicolon on the command line is also a way to separate commands. Unfortunately, sbt is not very good at quoting, so we either have to jump into the sbt shell before running the application, or package up the application and then run it. Let's go through some of the various ways.
 
 #### CSV that has a header and defaults all other configurations:
 
 ```bash
 sbt 'run --csv=src/main/resources/includes-header.csv --header=true'
+```
+
+and to set a more granular **log level** of **debug**:
+
+```bash
+sbt 'run --csv=src/main/resources/includes-header.csv --header=true --logLevel=debug'
 ```
 
 #### CSV without a header and overrides field delimiter:

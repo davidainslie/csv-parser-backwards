@@ -21,11 +21,11 @@ object Dependencies {
   )
 
   lazy val scalacheckShapeless: Seq[ModuleID] = Seq(
-    "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.4" % Test
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5" % Test
   )
 
   lazy val scribe: Seq[ModuleID] = Seq(
-    "com.outr" %% "scribe" % "2.7.11" withSources() withJavadoc()
+    "com.outr" %% "scribe" % "2.7.12" withSources() withJavadoc()
   )
 
   lazy val scopt: Seq[ModuleID] = Seq(
@@ -60,7 +60,7 @@ object Dependencies {
 
   lazy val refined: Seq[ModuleID] = {
     val group = "eu.timepit"
-    val version = "0.9.12"
+    val version = "0.9.13"
 
     Seq(
       "refined", "refined-cats"
@@ -69,7 +69,7 @@ object Dependencies {
 
   lazy val monocle: Seq[ModuleID] = {
     val group = "com.github.julien-truffaut"
-    val version = "2.0.1"
+    val version = "2.0.4"
 
     Seq(
       "monocle-core", "monocle-macro", "monocle-generic"

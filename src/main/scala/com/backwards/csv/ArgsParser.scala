@@ -5,9 +5,24 @@ import scala.Function.{uncurried => uncurry}
 import scala.util.chaining._
 import scala.util.matching.Regex
 import scopt.OParser
+import scribe.Level
 import com.backwards.tag._
 
 object ArgsParser {
+  lazy val logLevel: String => Csv => Csv = {
+    def logLevel(level: Level): Csv => Csv = {
+      scribe.Logger.root.clearHandlers().clearModifiers().withHandler(minimumLevel = Some(level)).replace()
+      identity
+    }
+
+    _.toLowerCase match {
+      case "debug" => logLevel(Level.Debug)
+      case "warn" => logLevel(Level.Warn)
+      case "error" => logLevel(Level.Error)
+      case _ => logLevel(Level.Info) // Default TODO - Bit of a cop-out but added last minute and will revise one day.
+    }
+  }
+
   lazy val file: File => Csv => Csv =
     Csv.file.set
 
@@ -39,6 +54,10 @@ object ArgsParser {
 
       OParser.sequence(
         programName("csv"),
+        opt[String]("logLevel")
+          .optional()
+          .action(uncurry(logLevel))
+          .text(s"""logLevel is an optional string property - denoting log level of debug, info, warn or error: info by default"""),
         opt[File]('c', "csv")
           .required()
           .valueName("<file>")
