@@ -40,7 +40,7 @@ object Line {
           } else {
             val parsedLine = parsed.flatten.map(_.replaceAll(lineDelimiter, " ")).mkString
             scribe.info(parsedLine)
-            excludesHeader(parsedLine = Option(parsedLine))
+            excludesHeader(Option(parsedLine))
           }
 
         case Left(errorMessage) =>
