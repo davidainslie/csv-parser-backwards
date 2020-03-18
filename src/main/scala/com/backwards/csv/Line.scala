@@ -12,18 +12,9 @@ import com.backwards.tag._
  *  cell"
  * </pre>
  */
-final case class Line(header: Boolean @@ Header, accumulatedChars: List[String] = Nil, parsedLine: Option[String] = None)
+final case class Line(header: Boolean @@ Header = false.tag[Header], accumulatedChars: List[String] = Nil, parsedLine: Option[String] = None)
 
 object Line {
-  val excludesHeader: Line =
-    Line(false.tag[Header])
-
-  def excludesHeader(accumulatedChars: List[String]): Line =
-    Line(false.tag[Header], accumulatedChars)
-
-  def excludesHeader(parsedLine: Option[String]): Line =
-    Line(false.tag[Header], parsedLine = parsedLine)
-
   def parse(csvParser: CsvParser)(line: Line, chars: String): Line = {
     import csvParser.csvConfig._
 
@@ -36,16 +27,16 @@ object Line {
       csvParser.parse(contiguousAccumulatedChars.stripSuffix(lineDelimiter) + lineSeparator) match {
         case Right(parsed) =>
           if (line.header) {
-            excludesHeader
+            Line()
           } else {
             val parsedLine = parsed.flatten.map(_.replaceAll(lineDelimiter, " ")).mkString
             scribe.info(parsedLine)
-            excludesHeader(Option(parsedLine))
+            Line(false.tag[Header], parsedLine = Option(parsedLine))
           }
 
         case Left(errorMessage) =>
           scribe.error(errorMessage)
-          excludesHeader
+          Line()
       }
     } else {
       Line(line.header, accumulatedChars)
