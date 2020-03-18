@@ -1,8 +1,8 @@
 package com.backwards.csv
 
 import java.lang.System.lineSeparator
-import cats.Show
-import cats.implicits._
+import shapeless.tag.@@
+import com.backwards.tag._
 
 /**
  * A line is either singular, or can be conflated from multiple lines by "quoting" text, where "quote" and "line delimiter" are configurable.
@@ -12,23 +12,43 @@ import cats.implicits._
  *  cell"
  * </pre>
  */
-final case class Line(accumulatedChars: List[String] = Nil, line: String = "")
+final case class Line(header: Boolean @@ Header, accumulatedChars: List[String] = Nil, parsedLine: Option[String] = None)
 
 object Line {
-  implicit val lineShow: Show[Line] =
-    line => s"Line(accumulatedChars = ${line.accumulatedChars}, line = ${line.line})"
+  val excludesHeader: Line =
+    Line(false.tag[Header])
 
-  def conflate(csvConfig: CsvConfig)(line: Line, chars: String): Line = {
-    scribe.debug(line.show)
+  def excludesHeader(accumulatedChars: List[String]): Line =
+    Line(false.tag[Header], accumulatedChars)
+
+  def excludesHeader(parsedLine: Option[String]): Line =
+    Line(false.tag[Header], parsedLine = parsedLine)
+
+  def parse(csvParser: CsvParser)(line: Line, chars: String): Line = {
+    import csvParser.csvConfig._
 
     val accumulatedChars = line.accumulatedChars :+ chars
     val contiguousAccumulatedChars = accumulatedChars.mkString
 
-    if (contiguousAccumulatedChars.count(_.toString == csvConfig.quote) % 2 == 0 &&
-        contiguousAccumulatedChars.endsWith(csvConfig.lineDelimiter)) {
-      Line(Nil, contiguousAccumulatedChars.stripSuffix(csvConfig.lineDelimiter) + lineSeparator)
+    if (contiguousAccumulatedChars.count(_.toString == quote) % 2 == 0 &&
+        contiguousAccumulatedChars.endsWith(lineDelimiter)) {
+
+      csvParser.parse(contiguousAccumulatedChars.stripSuffix(lineDelimiter) + lineSeparator) match {
+        case Right(parsed) =>
+          if (line.header) {
+            excludesHeader
+          } else {
+            val parsedLine = parsed.flatten.map(_.replaceAll(lineDelimiter, " ")).mkString
+            scribe.info(parsedLine)
+            excludesHeader(parsedLine = Option(parsedLine))
+          }
+
+        case Left(errorMessage) =>
+          scribe.error(errorMessage)
+          excludesHeader
+      }
     } else {
-      Line(accumulatedChars)
+      Line(line.header, accumulatedChars)
     }
   }
 }

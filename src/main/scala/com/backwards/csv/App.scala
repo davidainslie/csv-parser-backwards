@@ -12,22 +12,8 @@ object App extends IOApp {
         .readAll[IO](csvPath, blocker, 4 * 4096)
         .map(_.toChar.toString)
         .append(Stream.eval(IO.pure(csvParser.csvConfig.lineDelimiter)))
-        .scan(Line())(Line.conflate(csvParser.csvConfig))
-        .filter { case Line(_, line) =>
-          line.trim.nonEmpty
-        }
-        .drop(if (csvParser.csvConfig.header) 1 else 0)
-        .map { case Line(_, line) =>
-          csvParser.parse(line)
-        }
-        .foldMap {
-          case Right(lines) =>
-            scribe.info(lines.flatten.map(_.replaceAll(csvParser.csvConfig.lineDelimiter, " ")).show)
-            1
-          case Left(errorMessage) =>
-            scribe.error(errorMessage)
-            0
-        }
+        .scan(Line(csvParser.csvConfig.header))(Line.parse(csvParser))
+        .foldMap(_.parsedLine.fold(0)(_ => 1))
         .evalTap { n =>
           IO {
             scribe.info(s"End of CSV of $n valid line${if (n == 1) "" else "s"}")

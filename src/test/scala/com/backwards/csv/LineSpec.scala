@@ -2,70 +2,73 @@ package com.backwards.csv
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import com.backwards.csv.Line._
 import com.backwards.tag._
 
 class LineSpec extends AnyWordSpec with Matchers {
   "Line with default quote" should {
-    val csvConfig = CsvConfig()
-    import csvConfig._
+    val csvParser = new CsvParser(CsvConfig())
 
-    val conflate: (Line, String) => Line =
-      Line.conflate(csvConfig)
+    import csvParser.csvConfig._
 
-    "be conflated from simple/single line" in {
-      val line = s"My line$lineDelimiter"
+    val parse: (Line, String) => Line =
+      Line.parse(csvParser)
 
-      conflate(Line(), line) mustBe Line(line = line)
+    "be parsed from simple/single line" in {
+      val line = s"My line"
+
+      parse(excludesHeader, s"$line$lineDelimiter") mustBe excludesHeader(Option(line))
     }
 
-    "be conflated from multiple lines" in {
-      val line = s"My$lineDelimiter ${quote}line$quote complete$lineDelimiter"
+    "be parsed from multiple lines" in {
+      val line = s"My$lineDelimiter ${quote}line$quote complete"
 
-      conflate(Line(), line) mustBe Line(line = line)
+      parse(excludesHeader, s"$line$lineDelimiter") mustBe excludesHeader(Option("My line complete"))
     }
 
-    "be pending conflation" in {
+    "be pending parse" in {
       val line = s"My ${quote}line"
 
-      conflate(Line(), line) mustBe Line(accumulatedChars = List(line))
+      parse(excludesHeader, line) mustBe excludesHeader(accumulatedChars = List(line))
     }
 
-    "be pending conflation where new line would be embedded in quotes" in {
+    "be pending parse where new line would be embedded in quotes" in {
       val line = s"My ${quote}line$lineDelimiter"
 
-      conflate(Line(), line) mustBe Line(accumulatedChars = List(line))
+      parse(excludesHeader, line) mustBe excludesHeader(accumulatedChars = List(line))
     }
   }
 
   "Line with overriding quote" should {
-    val csvConfig = CsvConfig(quote = "#".tag[Quote])
-    import csvConfig._
+    val csvParser = new CsvParser(CsvConfig(quote = "#".tag[Quote]))
 
-    val conflate: (Line, String) => Line =
-      Line.conflate(csvConfig)
+    import csvParser.csvConfig._
 
-    "be conflated from simple/single line" in {
-      val line = s"My line$lineDelimiter"
+    val parse: (Line, String) => Line =
+      Line.parse(csvParser)
 
-      conflate(Line(), line) mustBe Line(line = line)
+    "be parsed from simple/single line" in {
+      val line = s"My line"
+
+      parse(excludesHeader, s"$line$lineDelimiter") mustBe excludesHeader(Option(line))
     }
 
-    "be conflated from multiple lines" in {
+    "be parsed from multiple lines" in {
       val line = s"My$lineDelimiter ${quote}line$quote complete$lineDelimiter"
 
-      conflate(Line(), line) mustBe Line(line = line)
+      parse(excludesHeader, s"$line$lineDelimiter") mustBe excludesHeader(Option("My line complete"))
     }
 
-    "be pending conflation" in {
+    "be pending parse" in {
       val line = s"My ${quote}line"
 
-      conflate(Line(), line) mustBe Line(accumulatedChars = List(line))
+      parse(excludesHeader, line) mustBe excludesHeader(accumulatedChars = List(line))
     }
 
-    "be pending conflation where new line would be embedded in quotes" in {
+    "be pending parse where new line would be embedded in quotes" in {
       val line = s"My ${quote}line$lineDelimiter"
 
-      conflate(Line(), line) mustBe Line(accumulatedChars = List(line))
+      parse(excludesHeader, line) mustBe excludesHeader(accumulatedChars = List(line))
     }
   }
 }
